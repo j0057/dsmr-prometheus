@@ -91,8 +91,7 @@ fn main() -> Result<(), String> {
         todo!()
     }
     else {
-        // TODO: make clap handle required + mutually-exclusive flags
-        return Err("Need either --connect or --serial".into());
+        unreachable!();
     }
 
     Ok(())

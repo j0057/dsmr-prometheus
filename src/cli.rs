@@ -1,12 +1,13 @@
-use clap::Parser;
+use clap::{Parser, ArgGroup};
 
 #[derive(Parser, Debug)]
 #[clap(author, version)]
+#[clap(group(ArgGroup::new("source").required(true)))]
 pub struct CLI {
-    #[clap(short, long)]
+    #[clap(short, long, group="source")]
     pub connect: Option<String>,
 
-    #[clap(short, long)]
+    #[clap(short, long, group="source")]
     pub serial: Option<String>,
 
     #[clap(short, long)]
