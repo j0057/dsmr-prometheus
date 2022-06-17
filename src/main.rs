@@ -71,7 +71,8 @@ fn main_loop<S: Read>(source: S) -> Result<(), String> {
 }
 
 fn main() -> Result<(), String> {
-    let cli = cli::CLI::new();
+    let cli = cli::CLI::new()
+        .map_err(|e| format!("Error parsing arguments: {e}"))?;
 
     println!("{cli:?}");
 
