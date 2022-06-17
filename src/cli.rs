@@ -3,13 +3,13 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[clap(author, version)]
 pub struct CLI {
-    #[clap(short='c', long)]
+    #[clap(short, long)]
     pub connect: Option<String>,
 
-    #[clap(short='s', long)]
+    #[clap(short, long)]
     pub serial: Option<String>,
 
-    #[clap(short='l', long)]
+    #[clap(short, long)]
     pub listen: Option<String>,
 }
 
