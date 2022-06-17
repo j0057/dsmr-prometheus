@@ -75,9 +75,7 @@ fn main() -> Result<(), String> {
 
     println!("{cli:?}");
 
-    // TODO: make clap handle default
-    let listen = cli.listen.unwrap_or("0.0.0.0:9194".into());
-    let bind = listen.parse()
+    let bind = cli.listen.parse()
         .map_err(|e| format!("Cannot parse binding address {listen:?}: {e:?}"))?;
     let _exporter = prometheus_exporter::start(bind)
         .map_err(|e| format!("Error starting Prometheus exporter: {e:?}"))?;

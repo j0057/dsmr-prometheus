@@ -10,8 +10,8 @@ pub struct CLI {
     #[clap(short, long, group="source")]
     pub serial: Option<String>,
 
-    #[clap(short, long)]
-    pub listen: Option<String>,
+    #[clap(short, long, default_value="0.0.0.0:9194")]
+    pub listen: String,
 }
 
 impl CLI {
