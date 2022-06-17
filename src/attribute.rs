@@ -182,7 +182,7 @@ mod tests {
             ("1-0:32.36.0(00001)",                                          Attribute::VoltageSwells(1, 1)),
             ("0-0:96.13.0()",                                               Attribute::TextMessage("".into())),
             ("1-0:32.7.0(242.6*V)",                                         Attribute::InstantVoltage(1, 242.6)),
-            ("1-0:31.7.0(012*A)",                                           Attribute::InstantCurrent(1, 12)),
+            ("1-0:31.7.0(012*A)",                                           Attribute::InstantCurrent(1, 12.0)),
             ("1-0:21.7.0(00.000*kW)",                                       Attribute::InstantPowerDelivered(1, 0.0)),
             ("1-0:22.7.0(03.059*kW)",                                       Attribute::InstantPowerReceived(1, 3.059)),
             ("0-1:24.1.0(003)",                                             Attribute::GasEquipmentDeviceType(1, 3)),
