@@ -70,7 +70,7 @@ fn main_loop<S: Read>(source: S) -> Result<(), String> {
     }
 }
 
-fn main() -> Result<(), String> {
+fn main_() -> Result<(), String> {
     let cli = cli::CLI::new()
         .map_err(|e| format!("Error parsing arguments: {e}"))?;
 
@@ -94,4 +94,11 @@ fn main() -> Result<(), String> {
     }
 
     Ok(())
+}
+
+fn main() {
+    if let Err(e) = main_() {
+        eprintln!("{e}");
+        std::process::exit(1);
+    }
 }
