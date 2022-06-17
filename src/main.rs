@@ -76,13 +76,13 @@ fn main() -> Result<(), String> {
     println!("{cli:?}");
 
     let bind = cli.listen.parse()
-        .map_err(|e| format!("Cannot parse binding address {listen:?}: {e:?}"))?;
+        .map_err(|e| format!("Cannot parse binding address {:?}: {e}", cli.listen))?;
     let _exporter = prometheus_exporter::start(bind)
-        .map_err(|e| format!("Error starting Prometheus exporter: {e:?}"))?;
+        .map_err(|e| format!("Error starting Prometheus exporter: {e}"))?;
 
     if let Some(host) = cli.connect {
         let source = TcpStream::connect(host.clone())
-            .map_err(|e| format!("Error connecting to {host}: {e:?}"))?;
+            .map_err(|e| format!("Error connecting to {host}: {e}"))?;
         main_loop(source)?;
     }
     else if let Some(_tty) = cli.serial {
