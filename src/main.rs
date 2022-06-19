@@ -51,14 +51,14 @@ fn try_main() -> Result<(), String> {
     exporter::start(cli.listen)?;
 
     // connect to TCP source
-    if let Some(ref host) = cli.connect {
+    if let Some(ref host) = cli.source.connect {
         let source = TcpStream::connect(host)
             .map_err(|e| format!("Error connecting to {host}: {e}"))?;
         main_loop(source)?;
     }
 
     // connect to serial source
-    else if let Some(ref tty) = cli.serial {
+    else if let Some(ref tty) = cli.source.serial {
         let source = serialport::new(tty, cli.baud_rate).open()
             .map_err(|e| format!("Error opening serial port {tty}: {e}"))?;
         main_loop(source)?;

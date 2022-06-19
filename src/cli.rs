@@ -1,15 +1,11 @@
-use clap::{Parser, ArgGroup};
+use clap::{Parser, ArgGroup, Args};
 use clap_verbosity_flag::{Verbosity, WarnLevel};
 
 #[derive(Parser, Debug)]
 #[clap(author, version)]
-#[clap(group(ArgGroup::new("source").required(true)))]
 pub struct CLI {
-    #[clap(short, long, group="source")]
-    pub connect: Option<String>,
-
-    #[clap(short, long, group="source")]
-    pub serial: Option<String>,
+    #[clap(flatten)]
+    pub source: SourceArgs,
 
     #[clap(short, long, default_value="115200")]
     pub baud_rate: u32,
@@ -19,6 +15,16 @@ pub struct CLI {
 
     #[clap(flatten)]
     pub verbosity: Verbosity<WarnLevel>,
+}
+
+#[derive(Args, Debug)]
+#[clap(group(ArgGroup::new("source").required(true)))]
+pub struct SourceArgs {
+    #[clap(short, long, group="source")]
+    pub connect: Option<String>,
+
+    #[clap(short, long, group="source")]
+    pub serial: Option<String>,
 }
 
 impl CLI {
