@@ -63,7 +63,7 @@ impl Telegram {
             }
 
             // good CRC16-ARC: instantiate new Telegram
-            return Ok(Telegram::new(result)?);
+            return Telegram::new(result);
         }
     }
 }
