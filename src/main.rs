@@ -60,7 +60,7 @@ fn try_main() -> Result<(), String> {
     // connect to serial source
     else if let Some(ref tty) = cli.serial {
         let source = serialport::new(tty, cli.baud_rate).open()
-            .map_err(|e| format!("Error opening serial port {:?}: {e}", tty))?;
+            .map_err(|e| format!("Error opening serial port {tty}: {e}"))?;
         main_loop(source)?;
     }
 
