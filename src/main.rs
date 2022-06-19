@@ -72,25 +72,32 @@ fn main_loop<S: Read>(source: S) -> Result<(), String> {
 }
 
 fn main_() -> Result<(), String> {
+    // parse program arguments
     let cli = cli::CLI::new()
         .map_err(|e| format!("Error parsing arguments: {e}"))?;
 
     println!("{cli:?}");
 
+    // start prometheus_exporter
     let bind = cli.listen.parse()
         .map_err(|e| format!("Cannot parse binding address {:?}: {e}", cli.listen))?;
     let _exporter = prometheus_exporter::start(bind)
         .map_err(|e| format!("Error starting Prometheus exporter: {e}"))?;
 
+    // connect to TCP source
     if let Some(host) = cli.connect {
         let source = TcpStream::connect(host.clone())
             .map_err(|e| format!("Error connecting to {host}: {e}"))?;
         main_loop(source)?;
     }
+
+    // connect to serial source
     else if let Some(_tty) = cli.serial {
         // TODO: implement serial source
         todo!()
     }
+
+    // should never happen
     else {
         unreachable!();
     }
