@@ -16,7 +16,7 @@ pub struct CLI {
 
 impl CLI {
     pub fn new() -> Result<Self, clap::Error> {
-        return Self::try_parse();
+        Self::try_parse()
     }
 }
 
