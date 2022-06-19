@@ -12,7 +12,7 @@ pub struct CLI {
     pub serial: Option<String>,
 
     #[clap(short, long, default_value="115200")]
-    pub baud_rate : u32,
+    pub baud_rate: u32,
 
     #[clap(short, long, default_value="0.0.0.0:9194")]
     pub listen: String,
