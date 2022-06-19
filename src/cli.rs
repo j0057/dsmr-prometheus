@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::{Parser, ArgGroup, Args};
 use clap_verbosity_flag::{Verbosity, WarnLevel};
 
@@ -25,17 +27,22 @@ pub struct SourceArgs {
 
     #[clap(short, long, group="source")]
     pub serial: Option<String>,
+
+    #[clap(short, long, group="source")]
+    pub file: Option<PathBuf>,
 }
 
 pub enum Source {
     Socket(String),
     Serial(String),
+    File(PathBuf),
 }
 
 impl SourceArgs {
     pub fn get(&self) -> Source {
         None.xor(self.connect.clone().map(Source::Socket))
             .xor(self.serial.clone().map(Source::Serial))
+            .xor(self.file.clone().map(Source::File))
             .unwrap()
     }
 }
@@ -81,6 +88,11 @@ mod test {
     #[test]
     fn test_source_serial() {
         assert!(CLI::try_parse_from(["./foo", "-l", "0.0.0.0:9194", "-s", "/dev/ttyS0"]).is_ok());
+    }
+
+    #[test]
+    fn test_source_file() {
+        assert!(CLI::try_parse_from(["./foo", "-l", "0.0.0.0:9194", "-f", "file.txt"]).is_ok());
     }
 
     #[test]

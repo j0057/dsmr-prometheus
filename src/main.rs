@@ -4,6 +4,7 @@ pub mod exporter;
 pub mod cli;
 
 use std::net::TcpStream;
+use std::fs::File;
 use std::io::{BufReader, Read};
 
 use log::{debug, error};
@@ -60,6 +61,11 @@ fn try_main() -> Result<(), String> {
         Source::Serial(ref tty) => {
             let source = serialport::new(tty, cli.baud_rate).open()
                 .map_err(|e| format!("Error opening serial port {tty}: {e}"))?;
+            main_loop(source)?;
+        },
+        Source::File(ref path) => {
+            let source = File::options().read(true).open(path)
+                .map_err(|e| format!("Error opening {path:?}: {e}"))?;
             main_loop(source)?;
         },
     }
