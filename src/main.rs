@@ -11,6 +11,7 @@ use prometheus_exporter::prometheus;
 use attribute::Attribute;
 use telegram::Telegram;
 
+// TODO: move this to own type instead of lazy_statics
 lazy_static! {
     static ref ELECTRICITY_DELIVERED: prometheus::GaugeVec
         = prometheus::register_gauge_vec!("electricity_delivered", "Meter reading electricity delivered to client (kWh)", &["tariff"]).unwrap();
@@ -87,6 +88,7 @@ fn main_() -> Result<(), String> {
         main_loop(source)?;
     }
     else if let Some(_tty) = cli.serial {
+        // TODO: implement serial source
         todo!()
     }
     else {
