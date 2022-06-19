@@ -28,7 +28,7 @@ impl Telegram {
                 .skip(2)
                 .map(|e| e.trim_end().parse())
                 .collect::<Result<Vec<Attribute>, String>>()
-                .map_err(|s| Error::Attribute(s))?,
+                .map_err(Error::Attribute)?,
         };
         Ok(result)
     }
