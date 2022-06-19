@@ -32,8 +32,13 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_long() -> Result<(), clap::Error> {
+    fn test_long_1() -> Result<(), clap::Error> {
         CLI::try_parse_from(["./foo", "--connect", "example.com:8000", "--listen", "0.0.0.0:9194"])?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_long_2() -> Result<(), clap::Error> {
         CLI::try_parse_from(["./bar", "--serial", "/dev/ttyS0", "--listen", "0.0.0.0:9194"])?;
         Ok(())
     }
