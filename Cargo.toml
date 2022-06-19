@@ -1,5 +1,5 @@
 [package]
-name = "dsmr5-p1-prometheus"
+name = "dsmr-prometheus"
 version = "0.1.0"
 edition = "2021"
 
