@@ -11,6 +11,12 @@ use log::{debug, error};
 use telegram::Telegram;
 use cli::CLI;
 
+fn is_interactive() -> bool {
+    unsafe {
+        libc::isatty(1) == 1
+    }
+}
+
 fn main_loop<S: Read>(source: S) -> Result<(), String> {
     let mut reader = BufReader::new(source);
 
@@ -35,6 +41,7 @@ fn try_main() -> Result<(), String> {
     // initialize logger
     env_logger::Builder::from_default_env()
         .filter_level(cli.verbosity.log_level_filter())
+        .format_timestamp(is_interactive().then(|| env_logger::fmt::TimestampPrecision::Millis))
         .target(env_logger::Target::Stdout)
         .init();
 
