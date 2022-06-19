@@ -7,6 +7,7 @@ use std::net::TcpStream;
 use std::io::{BufReader, Read};
 
 use telegram::Telegram;
+use cli::CLI;
 
 fn main_loop<S: Read>(source: S) -> Result<(), String> {
     let mut reader = BufReader::new(source);
@@ -23,7 +24,7 @@ fn main_loop<S: Read>(source: S) -> Result<(), String> {
 
 fn try_main() -> Result<(), String> {
     // parse program arguments
-    let cli = cli::CLI::new()
+    let cli = CLI::new()
         .map_err(|e| format!("Error parsing arguments: {e}"))?;
 
     println!("{cli:?}");
