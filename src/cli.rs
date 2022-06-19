@@ -1,4 +1,5 @@
 use clap::{Parser, ArgGroup};
+use clap_verbosity_flag::{Verbosity, WarnLevel};
 
 #[derive(Parser, Debug)]
 #[clap(author, version)]
@@ -12,6 +13,9 @@ pub struct CLI {
 
     #[clap(short, long, default_value="0.0.0.0:9194")]
     pub listen: String,
+
+    #[clap(flatten)]
+    pub verbosity: Verbosity<WarnLevel>,
 }
 
 impl CLI {

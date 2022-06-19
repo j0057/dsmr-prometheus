@@ -34,6 +34,7 @@ fn try_main() -> Result<(), String> {
 
     // initialize logger
     env_logger::Builder::from_default_env()
+        .filter_level(cli.verbosity.log_level_filter())
         .target(env_logger::Target::Stdout)
         .init();
 
