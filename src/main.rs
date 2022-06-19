@@ -7,7 +7,6 @@ use std::net::TcpStream;
 use std::io::{BufReader, Read};
 
 use log::{debug, error};
-use serialport;
 
 use telegram::Telegram;
 use cli::CLI;
