@@ -6,6 +6,8 @@ pub mod cli;
 use std::net::TcpStream;
 use std::io::{BufReader, Read};
 
+use log::{debug, error};
+
 use telegram::Telegram;
 use cli::CLI;
 
@@ -18,16 +20,24 @@ fn main_loop<S: Read>(source: S) -> Result<(), String> {
 
         exporter::export(&telegram.elements);
 
-        println!("{telegram:?}");
+        debug!("{telegram:?}");
     }
 }
 
 fn try_main() -> Result<(), String> {
     // parse program arguments
     let cli = CLI::new()
-        .map_err(|e| format!("Error parsing arguments: {e}"))?;
+        .map_err(|e| {
+            println!("{e}"); // logger is not yet initialized at this point
+            format!("Error parsing arguments: {e}")
+        })?;
 
-    println!("{cli:?}");
+    // initialize logger
+    env_logger::Builder::from_default_env()
+        .target(env_logger::Target::Stdout)
+        .init();
+
+    debug!("{cli:?}");
 
     // start prometheus_exporter
     exporter::start(cli.listen)?;
@@ -57,7 +67,7 @@ fn try_main() -> Result<(), String> {
 
 fn main() {
     if let Err(e) = try_main() {
-        eprintln!("{e}");
+        error!("Exiting with error: {e}");
         std::process::exit(1);
     }
 }

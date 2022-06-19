@@ -1,5 +1,6 @@
 use std::io::{self, BufReader, Read, BufRead};
 
+use log::{debug, warn};
 use crc16::{State, ARC};
 
 use crate::attribute::Attribute;
@@ -54,8 +55,8 @@ impl Telegram {
             // bad CRC16-ARC: complain and reset and attempt again
             crc16.update(b"!");
             if line != format!("!{:04X}\r\n", crc16.get()) {
-                eprintln!("{result:?} {line:?} {:04X}", crc16.get());
-                eprintln!("CRC mismatch; resyncing");
+                debug!("{result:?} {line:?} {:04X}", crc16.get());
+                warn!("CRC mismatch; resyncing");
                 result = vec![];
                 crc16 = State::<ARC>::new();
                 // TODO: prevent endless loop here by trying a reasonable number of times
