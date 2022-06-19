@@ -9,7 +9,7 @@ use std::io::{BufReader, Read};
 use log::{debug, error};
 
 use telegram::Telegram;
-use cli::CLI;
+use cli::{CLI, Source};
 
 fn is_interactive() -> bool {
     unsafe {
@@ -50,25 +50,18 @@ fn try_main() -> Result<(), String> {
     // start prometheus_exporter
     exporter::start(cli.listen)?;
 
-    // connect to TCP source
-    if let Some(ref host) = cli.source.connect {
-        let source = TcpStream::connect(host)
-            .map_err(|e| format!("Error connecting to {host}: {e}"))?;
-        main_loop(source)?;
-    }
-
-    // connect to serial source
-    else if let Some(ref tty) = cli.source.serial {
-        let source = serialport::new(tty, cli.baud_rate).open()
-            .map_err(|e| format!("Error opening serial port {tty}: {e}"))?;
-        main_loop(source)?;
-    }
-
-    // TODO: implement file source
-
-    // should never happen
-    else {
-        unreachable!();
+    // connect to source and start source-specific main loop
+    match cli.source.get() {
+        Source::Socket(ref host) => {
+            let source = TcpStream::connect(host)
+                .map_err(|e| format!("Error connecting to {host}: {e}"))?;
+            main_loop(source)?;
+        },
+        Source::Serial(ref tty) => {
+            let source = serialport::new(tty, cli.baud_rate).open()
+                .map_err(|e| format!("Error opening serial port {tty}: {e}"))?;
+            main_loop(source)?;
+        },
     }
 
     Ok(())

@@ -27,6 +27,19 @@ pub struct SourceArgs {
     pub serial: Option<String>,
 }
 
+pub enum Source {
+    Socket(String),
+    Serial(String),
+}
+
+impl SourceArgs {
+    pub fn get(&self) -> Source {
+        None.xor(self.connect.clone().map(Source::Socket))
+            .xor(self.serial.clone().map(Source::Serial))
+            .unwrap()
+    }
+}
+
 impl CLI {
     pub fn new() -> Result<Self, clap::Error> {
         Self::try_parse()
