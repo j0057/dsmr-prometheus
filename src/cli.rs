@@ -38,6 +38,16 @@ pub enum Source {
     File(PathBuf),
 }
 
+impl std::fmt::Display for Source {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Source::Socket(ref host)            => write!(f, "TCP source {host}"),
+            Source::Serial(ref tty, baud_rate)  => write!(f, "serial port source {tty} ({baud_rate} bps)"),
+            Source::File(ref path)              => write!(f, "file source {path:?}"),
+        }
+    }
+}
+
 impl CLI {
     pub fn new() -> Result<Self, clap::Error> {
         Self::try_parse()
