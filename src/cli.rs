@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use clap::{Parser, ArgGroup, Args};
-use clap_verbosity_flag::{Verbosity, WarnLevel};
+use clap_verbosity_flag::{Verbosity, InfoLevel};
 
 #[derive(Parser, Debug)]
 #[clap(author, version)]
@@ -16,7 +16,7 @@ pub struct CLI {
     pub listen: String,
 
     #[clap(flatten)]
-    pub verbosity: Verbosity<WarnLevel>,
+    pub verbosity: Verbosity<InfoLevel>,
 }
 
 #[derive(Args, Debug)]
