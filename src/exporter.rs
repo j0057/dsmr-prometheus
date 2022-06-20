@@ -37,7 +37,7 @@ lazy_static! {
         = prometheus::register_gauge!("gas_delivered", "Gas delivered to client (m³)").unwrap();
 }
 
-pub fn start(listen: String) -> Result<(), String> {
+pub fn start(listen: &str) -> Result<(), String> {
     let bind = listen.parse()
         .map_err(|e| format!("Cannot parse binding address {:?}: {e}", listen))?;
     let _exporter = prometheus_exporter::start(bind)

@@ -49,7 +49,7 @@ fn try_main() -> Result<(), String> {
     debug!("{cli:?}");
 
     // start prometheus_exporter
-    exporter::start(cli.listen)?;
+    exporter::start(&cli.listen)?;
 
     // connect to source and start source-specific main loop
     match cli.source.get() {
