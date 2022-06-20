@@ -6,6 +6,7 @@ pub mod cli;
 use std::net::TcpStream;
 use std::fs::File;
 use std::io::{BufReader, Read};
+use std::time::Duration;
 
 use log::{debug, info, error};
 
@@ -63,7 +64,9 @@ fn try_main() -> Result<(), String> {
             main_loop(source)?;
         },
         Source::Serial(ref tty, bps) => {
-            let source = serialport::new(tty, bps).open()
+            let source = serialport::new(tty, bps)
+                .timeout(Duration::from_secs(5))
+                .open()
                 .map_err(|e| format!("Error opening serial port {tty}: {e}"))?;
             main_loop(source)?;
         },
