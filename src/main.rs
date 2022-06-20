@@ -7,7 +7,7 @@ use std::net::TcpStream;
 use std::fs::File;
 use std::io::{BufReader, Read};
 
-use log::{debug, error};
+use log::{debug, info, error};
 
 use telegram::Telegram;
 use cli::{CLI, Source};
@@ -46,6 +46,10 @@ fn try_main() -> Result<(), String> {
         .target(env_logger::Target::Stdout)
         .init();
 
+    // say something
+    info!("{} {} starting", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+    info!("Reading from {}", cli.source());
+    info!("Prometheus listening on http://{}/", cli.listen);
     debug!("{cli:?}");
 
     // start prometheus_exporter
