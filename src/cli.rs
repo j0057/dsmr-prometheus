@@ -7,10 +7,10 @@ use clap_verbosity_flag::{Verbosity, InfoLevel};
 #[clap(author, version)]
 pub struct CLI {
     #[clap(flatten)]
-    pub source: SourceArgs,
+    source: SourceArgs,
 
     #[clap(short, long, default_value="115200")]
-    pub baud_rate: u32,
+    baud_rate: u32,
 
     #[clap(short, long, default_value="0.0.0.0:9194")]
     pub listen: String,
@@ -34,22 +34,20 @@ pub struct SourceArgs {
 
 pub enum Source {
     Socket(String),
-    Serial(String),
+    Serial(String, u32),
     File(PathBuf),
-}
-
-impl SourceArgs {
-    pub fn get(&self) -> Source {
-        None.xor(self.connect.clone().map(Source::Socket))
-            .xor(self.serial.clone().map(Source::Serial))
-            .xor(self.file.clone().map(Source::File))
-            .unwrap()
-    }
 }
 
 impl CLI {
     pub fn new() -> Result<Self, clap::Error> {
         Self::try_parse()
+    }
+
+    pub fn source(&self) -> Source {
+        None.xor(self.source.connect.clone().map(Source::Socket))
+            .xor(self.source.serial.clone().map(|tty| Source::Serial(tty, self.baud_rate)))
+            .xor(self.source.file.clone().map(Source::File))
+            .unwrap()
     }
 }
 

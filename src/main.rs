@@ -52,14 +52,14 @@ fn try_main() -> Result<(), String> {
     exporter::start(&cli.listen)?;
 
     // connect to source and start source-specific main loop
-    match cli.source.get() {
+    match cli.source() {
         Source::Socket(ref host) => {
             let source = TcpStream::connect(host)
                 .map_err(|e| format!("Error connecting to {host}: {e}"))?;
             main_loop(source)?;
         },
-        Source::Serial(ref tty) => {
-            let source = serialport::new(tty, cli.baud_rate).open()
+        Source::Serial(ref tty, bps) => {
+            let source = serialport::new(tty, bps).open()
                 .map_err(|e| format!("Error opening serial port {tty}: {e}"))?;
             main_loop(source)?;
         },
