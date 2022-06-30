@@ -3,6 +3,14 @@
 This reads the output of a DSMR5 P1 port and exposes the metrics as a
 Prometheus endpoint.
 
+## Installing
+
+After installation, create a systemd drop-in file using `systemctl edit
+dsmr-prometheus.service`, and inside a `[Service]` section, add an
+`Environment=DSMR_PROMETHEUS_ARGS=` line, providing either the `--file`,
+`--connect` or `--serial` options. The default configuration is to open
+the `/dev/ttyUSB0` serial port at 115200 baud.
+
 ## Developing
 
 See the output of the P1 port on stdout:
