@@ -22,12 +22,12 @@ pub struct Telegram {
 }
 
 impl Telegram {
-    fn new(data: Vec<String>) -> Result<Self, Error> {
+    fn new<T: AsRef<str>>(data: &[T]) -> Result<Self, Error> {
         let result = Telegram {
-            header: data[0][1..].trim_end().into(),
+            header: data[0].as_ref()[1..].trim_end().into(),
             elements: data.iter()
                 .skip(2)
-                .map(|e| e.trim_end().parse())
+                .map(|e| e.as_ref().trim_end().parse())
                 .collect::<Result<Vec<Attribute>, anyhow::Error>>()
                 .map_err(Error::Attribute)?,
         };
@@ -64,7 +64,7 @@ impl Telegram {
             }
 
             // good CRC16-ARC: instantiate new Telegram
-            return Telegram::new(result);
+            return Telegram::new(&result);
         }
     }
 }
