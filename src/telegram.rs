@@ -51,9 +51,11 @@ impl Telegram {
                 result.push(line);
                 continue;
             }
+            else {
+                crc16.update(b"!");
+            }
 
             // bad CRC16-ARC: complain and reset and attempt again
-            crc16.update(b"!");
             if line != format!("!{:04X}\r\n", crc16.get()) {
                 debug!("{result:?} {line:?} {:04X}", crc16.get());
                 warn!("CRC mismatch; resyncing");
