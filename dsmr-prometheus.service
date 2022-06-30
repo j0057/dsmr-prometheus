@@ -1,0 +1,14 @@
+[Unit]
+Description=DSMR Prometheus exporter
+
+[Service]
+Type=simple
+;Environment=DSMR_PROMETHEUS_ARGS=--connect example.com:4000
+;Environment=DSMR_PROMETHEUS_ARGS=--serial /dev/ttyS0
+Environment=DSMR_PROMETHEUS_ARGS=--serial /dev/ttyUSB0
+ExecStart=/usr/bin/dsmr-prometheus $DSMR_PROMETHEUS_ARGS
+User=daemon
+Group=uucp
+
+[Install]
+WantedBy=multi-user.target
