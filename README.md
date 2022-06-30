@@ -1,5 +1,8 @@
 # DSMR5-P1 to Prometheus logger
 
+This reads the output of a DSMR5 P1 port and exposes the metrics as a
+Prometheus endpoint.
+
 ## Developing
 
 See the output of the P1 port on stdout:
