@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use anyhow::{anyhow, Context};
+
 #[derive(Debug, PartialEq)]
 pub enum Unit {
     KiloWatt,
@@ -11,7 +13,7 @@ pub enum Unit {
 }
 
 impl FromStr for Unit {
-    type Err = String;
+    type Err = anyhow::Error;
 
     fn from_str(text: &str) -> Result<Self, Self::Err> {
         match text {
@@ -21,7 +23,7 @@ impl FromStr for Unit {
             "V"     => Ok(Self::Volt),
             "m3"    => Ok(Self::CubicMeters),
             "s"     => Ok(Self::Seconds),
-             _      => Err(format!("Unknown unit {text:?}")),
+             _      => Err(anyhow!("Unknown unit {text:?}")),
         }
     }
 }
@@ -55,54 +57,56 @@ pub enum Attribute {
 }
 
 impl Attribute {
-    fn parse_hex(line: &str) -> Result<String, String> {
+    fn parse_hex(line: &str) -> Result<String, anyhow::Error> {
         let bytes = (0..line.len())
             .step_by(2)
             .map(|i| u8::from_str_radix(&line[i..i+2], 16))
             .collect::<Result<Vec<u8>, std::num::ParseIntError>>()
-            .map_err(|e| format!("Cannot parse {line:?} as hex string: {e:?}"))?;
+            .with_context(|| format!("Cannot parse line as hex string: {line:?}"))?;
 
-        String::from_utf8(bytes)
-            .map_err(|e| format!("Cannot parse sequence as UTF-8: {e:?}"))
+        let string = String::from_utf8(bytes)
+            .with_context(|| format!("Cannot parse line as UTF-8: {line:?}"))?;
+
+        Ok(string)
     }
 
-    fn parse_num_unit<T: FromStr>(value: &str) -> Result<(T, String), String>
-    where <T as FromStr>::Err: std::fmt::Debug
+    fn parse_num_unit<T: FromStr>(value: &str) -> Result<(T, String), anyhow::Error>
+    where <T as FromStr>::Err: std::error::Error + Sync + Send + 'static
     {
         let index = value
             .find('*')
-            .ok_or_else(|| format!("Cannot find '*' in value {value:?}"))?;
+            .ok_or_else(|| anyhow!("Cannot find '*' in value {value:?}"))?;
         let (value, unit) = value.split_at(index);
         let value = value.parse()
-            .map_err(|e| format!("Error parsing number {value:?}: {e:?}"))?;
+            .with_context(|| format!("Error parsing number {value:?}"))?;
         Ok((value, unit.into()))
     }
 
-    fn parse_num<T: FromStr>(value: &str) -> Result<T, String>
-    where <T as FromStr>::Err: std::fmt::Debug,
+    fn parse_num<T: FromStr>(value: &str) -> Result<T, anyhow::Error>
+    where <T as FromStr>::Err: std::error::Error + Sync + Send + 'static
     {
-        value
-            .parse()
-            .map_err(|e| format!("Error parsing number {value:?}: {e:?}"))
+        let num = value.parse()
+            .with_context(|| format!("Error parsing number {value:?}"))?;
+        Ok(num)
     }
 }
 
 impl FromStr for Attribute {
-    type Err = String;
+    type Err = anyhow::Error;
 
     fn from_str(line: &str) -> Result<Self, Self::Err> {
         // split before and after first parenthesis
         let delim = line.find('(')
-                        .ok_or_else(|| format!("First parenthesis not found in value {line:?}"))?;
+                        .ok_or_else(|| anyhow!("First parenthesis not found in value {line:?}"))?;
         let (obis, values) = line.split_at(delim);
 
         // parse key to a [u8; 5]
         let key: [u8; 5] = obis.split(&['-', ':', '.'])
                                .map(str::parse::<u8>)
-                               .collect::<Result<Vec<u8>, _>>()
-                               .map_err(|e| format!("OBIS {obis:?} caused error parsing number: {e:?}"))?
+                               .collect::<Result<Vec<u8>, _>>()?
+                               .as_slice()
                                .try_into()
-                               .map_err(|e| format!("OBIS {obis:?} has wrong number of elements: {e:?}"))?;
+                               .with_context(|| format!("Error parsing OBIS {obis:?}"))?;
 
         // split values to a Vec<String>
         let value: Vec<String> = values.trim_start_matches('(')
@@ -155,7 +159,7 @@ impl FromStr for Attribute {
 
             [0, n, 24, 2, 1]                                        => Self::parse_num_unit(&value[1]).map(|(v, _)| Self::GasDelivered(n, value[0].clone(), v)),
 
-            _                                                       => Err(format!("Cannot parse OBIS key {key:?}")),
+            _                                                       => Err(anyhow!("Cannot parse OBIS key {key:?}")),
         }
     }
 }
@@ -165,7 +169,7 @@ mod tests {
     use super::Attribute;
 
     #[test]
-    fn test_attribute() -> Result<(), String> {
+    fn test_attribute() -> Result<(), anyhow::Error> {
         let tests = [
             ("1-3:0.2.8(50)",                                               Attribute::Version("50".into())),
             ("0-0:1.0.0(220611162528S)",                                    Attribute::Timestamp("220611162528S".into())),

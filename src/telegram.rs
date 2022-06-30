@@ -12,7 +12,7 @@ pub enum Error {
     #[error("Reached EOF reading from source")]
     EOF,
     #[error("Attribute error: {0}")]
-    Attribute(String)
+    Attribute(anyhow::Error)
 }
 
 #[derive(Debug)]
@@ -28,7 +28,7 @@ impl Telegram {
             elements: data.iter()
                 .skip(2)
                 .map(|e| e.trim_end().parse())
-                .collect::<Result<Vec<Attribute>, String>>()
+                .collect::<Result<Vec<Attribute>, anyhow::Error>>()
                 .map_err(Error::Attribute)?,
         };
         Ok(result)
