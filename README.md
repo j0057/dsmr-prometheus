@@ -22,6 +22,14 @@ machine that is not in the fuse cabinet:
 
     socat file:/dev/ttyUSB0,b115200,raw tcp-listen:4000,reuseaddr
 
+## Building Arch package
+
+Just run `extra-x86_64-build`, provided by the `devtools` package.
+
+It saves a lot of time to not download a new cargo index:
+
+    extra-x86_64-build -- -d ~/.cargo/registry:/build/.cargo/registry
+
 ## Links
 
 - [DSMR5 P1 Companion Standard][dsmr_p1]
