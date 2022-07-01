@@ -1,19 +1,11 @@
-use std::io::{self, BufReader, Read, BufRead};
+use std::io::{BufReader, Read, BufRead};
+
+use anyhow::anyhow;
 
 use log::{debug, warn};
 use crc16::{State, ARC};
 
 use crate::attribute::Attribute;
-
-#[derive(thiserror::Error, Debug)]
-pub enum Error {
-    #[error("I/O error reading frame: {0}")]
-    IO(#[from] io::Error),
-    #[error("Reached EOF reading from source")]
-    EOF,
-    #[error("Attribute error: {0}")]
-    Attribute(anyhow::Error)
-}
 
 #[derive(Debug)]
 pub struct Telegram {
@@ -22,19 +14,18 @@ pub struct Telegram {
 }
 
 impl Telegram {
-    fn new<T: AsRef<str>>(data: &[T]) -> Result<Self, Error> {
+    fn new<T: AsRef<str>>(data: &[T]) -> Result<Self, anyhow::Error> {
         let result = Telegram {
             header: data[0].as_ref()[1..].trim_end().into(),
             elements: data.iter()
                 .skip(2)
                 .map(|e| e.as_ref().trim_end().parse())
-                .collect::<Result<Vec<Attribute>, anyhow::Error>>()
-                .map_err(Error::Attribute)?,
+                .collect::<Result<Vec<Attribute>, anyhow::Error>>()?,
         };
         Ok(result)
     }
 
-    pub fn from<S: Read>(reader: &mut BufReader<S>) -> Result<Telegram, Error> {
+    pub fn from<S: Read>(reader: &mut BufReader<S>) -> Result<Telegram, anyhow::Error> {
         let mut result = vec![];
         let mut crc16 = State::<ARC>::new();
 
@@ -42,7 +33,7 @@ impl Telegram {
             // read a line
             let mut line = String::new();
             if reader.read_line(&mut line)? == 0 {
-                return Err(Error::EOF);
+                return Err(anyhow!("Unexpected EOF reached"));
             }
 
             // line is not last line: update CRC16-ARC and store it
