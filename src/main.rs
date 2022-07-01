@@ -83,7 +83,7 @@ fn try_main() -> Result<(), anyhow::Error> {
 
 fn main() {
     if let Err(e) = try_main() {
-        error!("Exiting with error: {e}");
+        error!("Exiting with error: {e:#}");
         std::process::exit(1);
     }
 }
