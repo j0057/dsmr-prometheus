@@ -1,6 +1,7 @@
 use lazy_static::lazy_static;
 use prometheus_exporter;
 use prometheus_exporter::prometheus;
+use anyhow::Context;
 
 use crate::attribute::Attribute;
 
@@ -37,11 +38,11 @@ lazy_static! {
         = prometheus::register_gauge!("gas_delivered", "Gas delivered to client (m³)").unwrap();
 }
 
-pub fn start(listen: &str) -> Result<(), String> {
+pub fn start(listen: &str) -> Result<(), anyhow::Error> {
     let bind = listen.parse()
-        .map_err(|e| format!("Cannot parse binding address {:?}: {e}", listen))?;
+        .with_context(|| format!("Error parsing binding address {listen:?}"))?;
     let _exporter = prometheus_exporter::start(bind)
-        .map_err(|e| format!("Error starting Prometheus exporter: {e}"))?;
+        .context("Error starting Prometheus exporter")?;
     Ok(())
 }
 
