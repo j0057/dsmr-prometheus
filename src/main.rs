@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::{BufReader, Read};
 use std::time::Duration;
 
+use anyhow::Context;
 use log::{debug, info, error};
 
 use telegram::Telegram;
@@ -19,12 +20,12 @@ fn is_interactive() -> bool {
     }
 }
 
-fn main_loop<S: Read>(source: S) -> Result<(), String> {
+fn main_loop<S: Read>(source: S) -> Result<(), anyhow::Error> {
     let mut reader = BufReader::new(source);
 
     loop {
         let telegram = Telegram::from(&mut reader)
-            .map_err(|e| format!("Error reading frame: {e}"))?;
+            .context("Error reading frame")?;
 
         exporter::export(&telegram.elements);
 
@@ -32,12 +33,12 @@ fn main_loop<S: Read>(source: S) -> Result<(), String> {
     }
 }
 
-fn try_main() -> Result<(), String> {
+fn try_main() -> Result<(), anyhow::Error> {
     // parse program arguments
     let cli = CLI::new()
         .map_err(|e| {
             println!("{e}"); // logger is not yet initialized at this point
-            format!("Error parsing arguments: {e}")
+            e
         })?;
 
     // initialize logger
@@ -60,19 +61,19 @@ fn try_main() -> Result<(), String> {
     match cli.source() {
         Source::Socket(ref host) => {
             let source = TcpStream::connect(host)
-                .map_err(|e| format!("Error connecting to {host}: {e}"))?;
+                .with_context(|| format!("Error connecting to {host}"))?;
             main_loop(source)?;
         },
         Source::Serial(ref tty, bps) => {
             let source = serialport::new(tty, bps)
                 .timeout(Duration::from_secs(5))
                 .open()
-                .map_err(|e| format!("Error opening serial port {tty}: {e}"))?;
+                .with_context(|| format!("Error opening serial port {tty}"))?;
             main_loop(source)?;
         },
         Source::File(ref path) => {
             let source = File::options().read(true).open(path)
-                .map_err(|e| format!("Error opening {path:?}: {e}"))?;
+                .with_context(|| format!("Error opening {path:?}"))?;
             main_loop(source)?;
         },
     }
